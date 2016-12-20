@@ -43,4 +43,19 @@ public class Hanjucc {
         }
         return data;
     }
+
+    public static String getVideoUrl(String url) {
+        String result = null;
+        try {
+            Document doc = Jsoup.connect(url).timeout(10000).get();
+            Element ads = doc.getElementById("ads");
+            Log.d(TAG,ads.text());
+            Element iframe = ads.getElementsByTag("iframe").get(0);
+            result = iframe.attr("src");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
 }

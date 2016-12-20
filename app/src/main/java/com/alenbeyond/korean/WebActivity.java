@@ -1,34 +1,66 @@
 package com.alenbeyond.korean;
 
+import android.graphics.PixelFormat;
+import android.os.Handler;
+import android.os.Message;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.alenbeyond.korean.crawler.Hanjucc;
+import com.tencent.smtt.sdk.WebChromeClient;
+import com.tencent.smtt.sdk.WebSettings;
+import com.tencent.smtt.sdk.WebView;
+import com.tencent.smtt.sdk.WebViewClient;
+
 public class WebActivity extends AppCompatActivity {
 
-    LinearLayout mNetNotAvailable;
     WebView mWebView;
     ProgressBar progressBarWeb;
+    ProgressBar progressBar;
     TextView tvNetInfo;
+    private Handler handler;
+    private String videoUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web);
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                if (msg.what == 222) {
+
+                    if (videoUrl == null) {
+                        Snackbar.make(mWebView, "加载失败啦", Snackbar.LENGTH_INDEFINITE)
+                                .setAction("雪微点这重试", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        initData();
+                                    }
+                                });
+                    } else {
+                        mWebView.loadUrl(videoUrl);
+                    }
+                    progressBar.setVisibility(View.INVISIBLE);
+                    mWebView.setVisibility(View.VISIBLE);
+                }
+            }
+        };
         initView();
         initData();
     }
 
     private void initView() {
-        mNetNotAvailable = (LinearLayout) findViewById(R.id.ll_web_net_not_available);
+        getSupportActionBar().setTitle(getIntent().getStringExtra("title"));
+        getWindow().setFormat(PixelFormat.TRANSLUCENT);
         mWebView = (WebView) findViewById(R.id.webView);
         progressBarWeb = (ProgressBar) findViewById(R.id.progressBar_web);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         tvNetInfo = (TextView) findViewById(R.id.tv_net_info);
 
         mWebView.setWebChromeClient(new MyWebChromeClient());
@@ -39,17 +71,36 @@ public class WebActivity extends AppCompatActivity {
         setting.setUseWideViewPort(true);
         setting.setLoadWithOverviewMode(true);
 
-        mNetNotAvailable.setOnClickListener(new View.OnClickListener() {
+        mWebView.setWebViewClient(new WebViewClient() {
+
             @Override
-            public void onClick(View view) {
-                initData();
+            public void onPageFinished(WebView webView, String s) {
+                progressBar.setVisibility(View.INVISIBLE);
+                mWebView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                return true;
             }
         });
     }
 
     private void initData() {
-        String url = getIntent().getStringExtra("url");
-        mWebView.loadUrl(url);
+        progressBar.setVisibility(View.VISIBLE);
+        mWebView.setVisibility(View.INVISIBLE);
+        final String url = getIntent().getStringExtra("url");
+        new Thread() {
+
+            @Override
+            public void run() {
+                videoUrl = Hanjucc.getVideoUrl(url);
+                if (handler != null) {
+                    handler.sendEmptyMessage(222);
+                }
+            }
+        }.start();
     }
 
     private class MyWebChromeClient extends WebChromeClient {
@@ -57,9 +108,6 @@ public class WebActivity extends AppCompatActivity {
         @Override
         public void onProgressChanged(WebView view, int newProgress) {
             if (newProgress == 100) {
-                if (mWebView.getTitle() != null) {
-                    getSupportActionBar().setTitle(mWebView.getTitle());
-                }
                 progressBarWeb.setVisibility(View.GONE);
             } else {
                 if (progressBarWeb.getVisibility() == View.GONE) {
