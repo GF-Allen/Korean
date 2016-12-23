@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alenbeyond.korean.crawler.Hanjucc;
 import com.tencent.smtt.sdk.WebChromeClient;
@@ -46,8 +47,6 @@ public class WebActivity extends AppCompatActivity {
                     } else {
                         mWebView.loadUrl(videoUrl);
                     }
-                    progressBar.setVisibility(View.INVISIBLE);
-                    mWebView.setVisibility(View.VISIBLE);
                 }
             }
         };
@@ -90,6 +89,7 @@ public class WebActivity extends AppCompatActivity {
     private void initData() {
         progressBar.setVisibility(View.VISIBLE);
         mWebView.setVisibility(View.INVISIBLE);
+        Toast.makeText(this, "雪微稍微的等一会哈", Toast.LENGTH_LONG).show();
         final String url = getIntent().getStringExtra("url");
         new Thread() {
 

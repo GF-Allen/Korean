@@ -50,8 +50,12 @@ public class Hanjucc {
             Document doc = Jsoup.connect(url).timeout(10000).get();
             Element ads = doc.getElementById("ads");
             Log.d(TAG,ads.text());
-            Element iframe = ads.getElementsByTag("iframe").get(0);
-            result = iframe.attr("src");
+            String[] iframes = ads.html().split("iframe");
+            String[] hrefs = iframes[1].split("\"");
+            String href = hrefs[1];
+            result = href;
+//            Element iframe = ads.getElementsByTag("iframe").get(0);
+//            result = iframe.attr("src");
         } catch (IOException e) {
             e.printStackTrace();
         }
