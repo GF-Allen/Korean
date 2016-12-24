@@ -104,7 +104,6 @@ public class WebActivity extends AppCompatActivity {
         Toast.makeText(this, "雪微稍微的等一会哈", Toast.LENGTH_LONG).show();
         String url = getIntent().getStringExtra("url");
         Log.d(TAG, url);
-        url = "http://p.y3600.com/yk/eq_C4894C3B8B27CA2C449F170B9D28EE1A&m=1&1.html";
         mWebView.loadUrl(url);
 //        new Thread() {
 //
