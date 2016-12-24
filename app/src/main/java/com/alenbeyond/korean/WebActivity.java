@@ -1,25 +1,34 @@
 package com.alenbeyond.korean;
 
+import android.content.pm.ActivityInfo;
 import android.graphics.PixelFormat;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alenbeyond.korean.crawler.Hanjucc;
-import com.tencent.smtt.sdk.WebChromeClient;
-import com.tencent.smtt.sdk.WebSettings;
-import com.tencent.smtt.sdk.WebView;
-import com.tencent.smtt.sdk.WebViewClient;
+//import com.tencent.smtt.sdk.WebChromeClient;
+//import com.tencent.smtt.sdk.WebSettings;
+//import com.tencent.smtt.sdk.WebView;
+//import com.tencent.smtt.sdk.WebViewClient;
 
 public class WebActivity extends AppCompatActivity {
 
+    private static final String TAG = "WebActivity";
     WebView mWebView;
     ProgressBar progressBarWeb;
     ProgressBar progressBar;
@@ -30,6 +39,10 @@ public class WebActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        //设置全屏模式
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //去标题
         setContentView(R.layout.activity_web);
         handler = new Handler() {
             @Override
@@ -55,7 +68,6 @@ public class WebActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        getSupportActionBar().setTitle(getIntent().getStringExtra("title"));
         getWindow().setFormat(PixelFormat.TRANSLUCENT);
         mWebView = (WebView) findViewById(R.id.webView);
         progressBarWeb = (ProgressBar) findViewById(R.id.progressBar_web);
@@ -90,17 +102,20 @@ public class WebActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
         mWebView.setVisibility(View.INVISIBLE);
         Toast.makeText(this, "雪微稍微的等一会哈", Toast.LENGTH_LONG).show();
-        final String url = getIntent().getStringExtra("url");
-        new Thread() {
-
-            @Override
-            public void run() {
-                videoUrl = Hanjucc.getVideoUrl(url);
-                if (handler != null) {
-                    handler.sendEmptyMessage(222);
-                }
-            }
-        }.start();
+        String url = getIntent().getStringExtra("url");
+        Log.d(TAG, url);
+        url = "http://p.y3600.com/yk/eq_C4894C3B8B27CA2C449F170B9D28EE1A&m=1&1.html";
+        mWebView.loadUrl(url);
+//        new Thread() {
+//
+//            @Override
+//            public void run() {
+//                videoUrl = Hanjucc.getVideoUrl(url);
+//                if (handler != null) {
+//                    handler.sendEmptyMessage(222);
+//                }
+//            }
+//        }.start();
     }
 
     private class MyWebChromeClient extends WebChromeClient {
@@ -118,5 +133,11 @@ public class WebActivity extends AppCompatActivity {
             progressBarWeb.postInvalidate();
             super.onProgressChanged(view, newProgress);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mWebView.destroy();
     }
 }

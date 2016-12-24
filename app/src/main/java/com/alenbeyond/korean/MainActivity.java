@@ -15,6 +15,7 @@ import android.widget.SeekBar;
 import com.alenbeyond.korean.adapter.HanjuAdapter;
 import com.alenbeyond.korean.bean.Hanju;
 import com.alenbeyond.korean.crawler.Hanjucc;
+import com.alenbeyond.korean.crawler.Y3600;
 import com.alenbeyond.korean.utils.NetUtils;
 
 import java.util.List;
@@ -93,7 +94,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void run() {
-                episodes = Hanjucc.getEpisodes();
+//                episodes = Hanjucc.getEpisodes();
+                episodes = Y3600.getEpisodes();
                 if (handler != null) {
                     Message msg = Message.obtain();
                     msg.what = 111;
